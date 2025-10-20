@@ -1,16 +1,20 @@
 // Create mysql2 db connection secured
 const mysql = require('mysql2');
 
-const pool = mysql.createPool({
+const _db_config_  = {
     host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
     user: process.env.DB_USER,
+    port: process.env.DB_PORT,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
-});
+};
+
+console.log("Database configuration:", _db_config_);
+
+const pool = mysql.createPool(_db_config_);
 
 const db = pool.promise();
 

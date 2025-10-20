@@ -8,7 +8,7 @@ const { ensureAuthenticated } = require('./authentication.service');
 const db = require('../../services/database.service');
 
 // Endpoint to get user profile (any authenticated user)
-router.get('/profile', ensureAuthenticated, async (req, res) => {
+router.get('/profile', async (req, res) => {
     try {
         const email = req.user.id; // Assuming req.user is set by authentication middleware
         const [rows] = await db.query('SELECT email, first_name, last_name, phone, role, last_login, active FROM users WHERE id = ?', [userId]);
