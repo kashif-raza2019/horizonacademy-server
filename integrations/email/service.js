@@ -29,7 +29,8 @@ const email_config = {
     secure: process.env.SMTP_SECURE || true, // true for 465, false for other ports
     tls: {
         // Bypass certificate validation - use with caution in production
-        checkServerIdentity: () => undefined
+        checkServerIdentity: () => undefined,
+        rejectUnauthorized: false
     }
 }
 
