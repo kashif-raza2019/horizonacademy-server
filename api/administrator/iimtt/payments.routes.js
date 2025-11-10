@@ -7,14 +7,16 @@ const {
 
 const router = require('express').Router();
 
-const STUDENTS_TABLE_NAME = "Students";
+const TABLE_NAME = "Payments";
 
-// APIs to interact with the Students Airtable table
+const { createRazorpayPaymentLink } = require('../../../integrations/payments');
 
-// Fetch all student records
+// APIs to interact with the Payments Airtable table
+
+// Fetch all payment records
 router.get('/', async (req, res) => {
     try {
-        const records = await fetchRecordsFromTable(STUDENTS_TABLE_NAME);
+        const records = await fetchRecordsFromTable(TABLE_NAME);
         let results = [];
         records.forEach(record => {
             results.push({
@@ -22,41 +24,47 @@ router.get('/', async (req, res) => {
                 fields: record.fields
             });
         });
-        res.json({count: results.length, records: results});
+        res.json({ count: results.length, records: results });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// Create a new student record
+// Create a new payment record
 router.post('/', async (req, res) => {
     try {
+
+        let recordFields = {
+            EnrollmentNumber: [req.body.enrollmentNumber],
+            Status: 'Pending',
+            Amount: req.body.amount
+        }
         const fields = req.body;
-        const newRecord = await createRecordInTable(STUDENTS_TABLE_NAME, fields);
-        res.status(201).json(newRecord);
+        const newRecord = await createRecordInTable(TABLE_NAME, fields);
+        res.status(201).json({ id: newRecord.id, fields: newRecord.fields });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// Update or Upsert student record API can be added here in future
+// Update or Upsert payment record API can be added here in future
 router.put('/:id', async (req, res) => {
     try {
         const recordId = req.params.id;
         const fields = req.body;
-        const updatedRecord = await updateRecordInTable(STUDENTS_TABLE_NAME, recordId, fields);
+        const updatedRecord = await updateRecordInTable(TABLE_NAME, recordId, fields);
 
-        res.json({id: updatedRecord.id, fields: updatedRecord.fields});
+        res.json({ id: updatedRecord.id, fields: updatedRecord.fields });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// Get student record API can be added here in future
+// Get payment record API can be added here in future
 router.get('/:id', async (req, res) => {
     try {
         const recordId = req.params.id;
-        const record = await getRecordById(STUDENTS_TABLE_NAME, recordId);
+        const record = await getRecordById(TABLE_NAME, recordId);
         res.json(record.fields);
     } catch (error) {
         res.status(500).json({ error: error.message });

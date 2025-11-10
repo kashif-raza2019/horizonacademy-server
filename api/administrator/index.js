@@ -8,6 +8,7 @@ const db = require('../../services/database.service');
 
 // Middleware to check for Administrator role from bearer token
 function isAdmin(req, res, next) {
+
     console.log("Checking admin role middleware");
     const authHeader = req.headers['authorization'];
     if (!authHeader) {
@@ -32,22 +33,23 @@ function isAdmin(req, res, next) {
     }
 }
 
-// Example endpoint to get all users (Administrator only)
-router.get('/users', isAdmin, async (req, res) => {
-    // In a real application, you would check if the requester has admin privileges
-    try {
-        const [rows] = await db.query('SELECT email, first_name, last_name, phone, role, last_login, active FROM users');
-        res.json(rows);
-    } catch (err) {
-        res.status(500).json({ error: 'Internal server error.' });
-    }
-});
-
 // Additional admin routes can be added here
 
+// User to manage users
+const adminUserRoutes = require('./users/index');
+router.use('/', isAdmin, adminUserRoutes);
+
 // IIMTT specific admin routes can be added here
-const iimttAdminRoutes = require('./iimtt/students.routes');
-router.use('/iimtt', isAdmin, iimttAdminRoutes);
+const iimttAdminStudentRoutes = require('./iimtt/students.routes');
+const iimttAdminPaymentRoutes = require('./iimtt/payments.routes');
+
+router.use('/iimtt/students', isAdmin, iimttAdminStudentRoutes);
+router.use('/iimtt/payments', isAdmin, iimttAdminPaymentRoutes);
+
+
+// Enquiries management routes
+const enquiriesRoutes = require('./enquiries/api');
+router.use('/enquiries', isAdmin, enquiriesRoutes);
 
 
 module.exports = router;

@@ -23,5 +23,17 @@ router.get('/', (req, res) => {
     res.send('Welcome to the API');
 });
 
+// Data base query runner for test environment
+router.post('/test-sql', async (req, res) => {
+    const db = require('../services/database.service');
+    const sql = req.body.query;
+    try {
+        const [rows, fields] = await db.query(sql);
+        return res.json({ success: true, data: rows });
+    } catch (err) {
+        return res.status(400).json({ success: false, error: err.message });
+    }
+});
+
 // Export the router
 module.exports = router;

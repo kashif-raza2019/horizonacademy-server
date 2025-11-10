@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Run APIs</title>
+</head>
+
+<body>
+    <div style="text-align: center; margin-top: 50px; font-family: Arial, sans-serif; font-size: 24px;">
+        This is the API Testing Page
+    </div>
+    <div style="text-align: center; margin-top: 20px; font-family: Arial, sans-serif; font-size: 16px;">
+        You can use this page to run test apis.
+    </div>
+    <select id="method" style="display: block; margin: 20px auto; width: 200px; font-size: 16px;">
+        <option value="GET">GET</option>
+        <option value="POST">POST</option>
+        <option value="PUT">PUT</option>
+        <option value="DELETE">DELETE</option>
+    </select>
+    <input 
+        type="text" 
+        style="display: block; margin: 20px auto; width: 80%;font-size: 16px;"
+        placeholder="Enter API Endpoint (e.g., /api/test-sql)" 
+        value="/api/test-sql"
+    />
+
+    <textarea id="request"
+        style="display: block; margin: 20px auto; width: 80%; height: 200px; font-family: monospace; font-size: 14px;"
+        placeholder="Enter your SQL query here..."></textarea>
+    <button style="display: block; margin: 0 auto; padding: 10px 20px; font-size: 16px;">Run Query</button>
+    <div
+        style="background-color: rgb(5, 5, 56);height: fit-content;min-height: 200px ;width: 100%;color: rgb(14, 190, 213);margin-top: 20px; font-family: Arial, sans-serif; font-size: 16px;">
+        <pre id="response" style="white-space: pre-wrap; word-wrap: break-word; padding: 10px;">
+    </pre>
+    </div>
+    <script>
+        // JavaScript to handle button click and run SQL query can be added here
+        let button = document.querySelector('button');
+        let res = {};
+        button.addEventListener('click', () => {
+            let request = document.getElementById('request').value;
+            // remove extra new lines and spaces from request
+            request = request.replace(/\s+/g, ' ').trim();
+            let method = document.getElementById('method').value;
+            // Add AJAX call to send query to server and get results
+            let options = {};
+            if(method === 'GET' || method === 'DELETE'){
+                options = {
+                    method: method,
+                };
+            } else {
+                options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query: request})
+                };
+            }
+            let endpoint = document.querySelector('input').value || '/api/test-sql';
+            fetch(endpoint , options)
+                .then(response => response.json())
+                .then(data => {
+                    res = data;
+                    document.getElementById('response').textContent = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    res = { error: error.toString() };
+                    document.getElementById('response').textContent = 'Error: ' + error;
+                });
+        });
+
+    </script>
+
+</body>
+
+</html>

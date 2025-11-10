@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 
 const session = require('express-session');
 const RedisStore = require('connect-redis').RedisStore;
@@ -23,7 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-    res.status(200).send('OK');
+  res.status(200).send('OK');
 });
 
 // Enable CORS for all routes
@@ -49,6 +50,26 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Public route
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+if (process.env.NODE_ENV === 'production') {
+  // Serve static files from the React app in production
+  app.use(express.static(path.join(__dirname, 'public')));
+
+  // Handle React routing, return all requests to React app
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  });
+}
+
+if (process.env.NODE_ENV !== 'production') {
+  // In non-production environments, serve test files from /tests at /tests route
+  app.use('/test-apis', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'test-sql.html')) });
+}
+
 // Import API routes
 const apiRoutes = require('./api');
 
@@ -58,11 +79,11 @@ app.use('/api', apiRoutes);
 
 // Disallow any other routes
 app.use((req, res, next) => {
-    res.status(404).send('Not Found');
+  res.status(404).send('Not Found');
 });
 
 
 // Start the server
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });

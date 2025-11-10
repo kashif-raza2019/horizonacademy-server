@@ -47,3 +47,7 @@ secrets/
 *.bak
 *.old
 *.orig
+
+# Test files
+tests/
+*.sql
