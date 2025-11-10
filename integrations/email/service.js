@@ -26,7 +26,11 @@ const email_user_selections = [
 const email_config = {
     host: process.env.SMTP_HOST,
     port: process.env.SMTP_PORT || 465,
-    secure: process.env.SMTP_SECURE || true // true for 465, false for other ports
+    secure: process.env.SMTP_SECURE || true, // true for 465, false for other ports
+    tls: {
+        // Bypass certificate validation - use with caution in production
+        checkServerIdentity: () => undefined
+    }
 }
 
 const email_transporter = (email_user) => {
